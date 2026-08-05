@@ -1,0 +1,404 @@
+/**
+ * Nexi XPay Build — Payment Form Styles
+ * Modern CSS: flex + grid only. No float, no clearfix.
+ */
+
+/* ── Form container ── */
+
+#nexi-payment-form {
+    padding: 15px 20px 12px;
+    box-sizing: border-box;
+    font-family: inherit;
+    max-width: 480px;
+}
+
+#nexi-gateway-container {
+    max-width: 400px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ── Error message ── */
+
+#nexi-error.nexi-error-message {
+    background: #fff5f5;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    color: #721c24;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+/* ── Saved cards (OneClick) ── */
+
+/* .nexi-saved-cards {
+    margin-bottom: 14px;
+} */
+
+.nexi-card-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+/* ── Accepted brands ── */
+
+.nexi-accepted-brands {
+    margin-bottom: 14px;
+}
+
+.nexi-accepted-brands-label {
+    display: block;
+    font-size: 12px;
+    color: #6b7c93;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.nexi-brands-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+.nexi-brand-logo {
+    box-sizing: border-box;
+    height: 24px;
+    width: auto;
+    border: 1px solid #e3e8ee;
+    border-radius: 3px;
+    padding: 2px 4px;
+    background: #fff;
+}
+
+/* ── Card form section ── */
+
+.nexi-card-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+    width: 100%;
+    min-width: 0;
+}
+
+.nexi-card-form-label {
+    font-size: 14px;
+
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Field wrapper — position: relative per icone assolute */
+.nexi-field-wrapper {
+    position: relative;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Row: expiry + CVV affiancati — stessa larghezza del PAN */
+.nexi-card-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    min-width: 0;
+}
+
+.nexi-card-row .nexi-field-wrapper {
+    min-width: 0;
+    overflow: visible;
+}
+
+/* ── Footer row: salva carta (sinistra) + logo Nexi (destra) ── */
+
+.nexi-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    gap: 12px;
+}
+
+/* ── Build field (iframe XPay container) ── */
+
+@keyframes nexi-shimmer {
+    0%   { background-position: -600px 0; }
+    100% { background-position:  600px 0; }
+}
+
+.nexi-build-field {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    min-height: 44px;
+    background: #fff;
+    border: 1px solid #ccd0d2;
+    border-radius: 4px;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-height: 40px;
+}
+
+/* Skeleton shimmer — visibile finché l'iframe non viene montato */
+.nexi-build-field:empty,
+.nexi-build-field.loading {
+    background: linear-gradient(
+        90deg,
+        #f5f5f5 0%,
+        #ebebeb 40%,
+        #d8d8d8 50%,
+        #ebebeb 60%,
+        #f5f5f5 100%
+    );
+    background-size: 1200px 100%;
+    animation: nexi-shimmer 1.6s ease-in-out infinite;
+    cursor: wait;
+}
+
+/* Campo con iframe XPay → flex per centrare verticalmente l'iframe (height: 18px fisso) */
+/* .nexi-build-field:not(:empty) {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    min-height: 44px;
+    animation: none;
+} */
+
+/* Spazio extra a destra per l'icona assoluta (lucchetto PAN, ? CVV) */
+.nexi-field-pan .nexi-build-field:not(:empty),
+.nexi-field-cvv .nexi-build-field:not(:empty) {
+    padding-right: 42px;
+}
+
+.nexi-build-field:focus-within {
+    border-color: #0095c3;
+    box-shadow: 0 0 0 3px rgba(0, 149, 195, 0.15);
+}
+
+/* ── Field icons (PAN lock, CVV ?) ── */
+
+.nexi-field-pan,
+.nexi-field-cvv {
+    position: relative;
+}
+
+.nexi-field-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    color: #aab7c4;
+    pointer-events: none;
+    line-height: 0;
+}
+
+.nexi-field-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+}
+
+/* CVV icon — tooltip on hover/focus */
+.nexi-cvv-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    color: #aab7c4;
+    cursor: pointer;
+    pointer-events: auto;
+    line-height: 0;
+}
+
+.nexi-cvv-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+}
+
+.nexi-cvv-tooltip {
+    display: none;
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 8px);
+    background: #32325d;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: 4px;
+    width: 220px;
+    z-index: 9999;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(50, 50, 93, 0.2);
+    white-space: normal;
+}
+
+.nexi-cvv-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 10px;
+    border: 5px solid transparent;
+    border-top-color: #32325d;
+}
+
+.nexi-cvv-icon:hover .nexi-cvv-tooltip,
+.nexi-cvv-icon:focus .nexi-cvv-tooltip {
+    display: block;
+}
+
+.nexi-cvv-icon:hover .nexi-cvv-tooltip,
+.nexi-cvv-icon:focus .nexi-cvv-tooltip {
+    display: block;
+}
+
+/* ── PCI DSS badge (Stripe-style) ── */
+
+.nexi-pci-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.nexi-pci-badge svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    opacity: 0.5;
+    fill: green;
+}
+
+.nexi-pci-badge-text {
+    font-size: 12px;
+    color: #8898aa;
+    line-height: 1.2;
+    max-width: 350px;
+}
+
+/* ── Footer row: salva carta (sinistra) + logo Nexi (destra) ── */
+
+.nexi-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    gap: 12px;
+}
+
+/* Nexi powered-by logo — sempre a destra nel footer row */
+.nexi-powered-by {
+    flex-shrink: 0;
+}
+
+.nexi-powered-by img.nexi-logo-powered {
+    display: block;
+    height: 28px;
+    width: auto;
+    opacity: 0.7;
+}
+
+/* Save card checkbox — a sinistra nel footer row */
+.nexi-save-card label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #32325d;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.nexi-save-card input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+/* ── Order view: payment info ── */
+
+.nexi-xpaybuild-info {
+    margin: 0;
+    padding: 0;
+}
+
+.nexi-xpaybuild-info dt {
+    font-weight: 600;
+    color: #555;
+    margin-top: 6px;
+}
+
+.nexi-xpaybuild-info dd {
+    margin: 0 0 4px;
+    color: #333;
+}
+
+/* ── Admin: payment info table ── */
+
+.nexi-xpaybuild-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.nexi-xpaybuild-info-table th,
+.nexi-xpaybuild-info-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    vertical-align: top;
+}
+
+.nexi-xpaybuild-info-table th {
+    font-weight: 600;
+    color: #555;
+    width: 40%;
+    background: #f9f9f9;
+}
+
+/* ── Nexi Pay button (replaces native .btn-checkout) ── */
+
+body.nexi-xpay-active .btn-checkout:not(.nexi-pay-button) {
+    display: none !important;
+}
+
+.nexi-pay-button {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    background: #0095c3;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+.nexi-pay-button:hover {
+    background: #007ba8;
+}
+
+.nexi-pay-button:disabled,
+.nexi-pay-button.loading {
+    opacity: 0.6;
+    cursor: wait;
+}

@@ -1,0 +1,21 @@
+{
+    "name": "empiricompany/maho-nexi-xpaybuild",
+    "version": "1.0.0",
+    "license": "OSL-3.0",
+    "type": "maho-module",
+    "description": "Nexi XPay Build embedded card payment for Maho",
+    "keywords": [
+        "maho",
+        "nexi",
+        "xpay",
+        "payment",
+        "gateway"
+    ],
+    "require": {
+        "php": ">=8.3 <8.6",
+        "mahocommerce/maho": ">=26.7.0"
+    },
+    "extra": {
+        "maho-module-dir": "app/code/community/Nexi/XPayBuild"
+    }
+}

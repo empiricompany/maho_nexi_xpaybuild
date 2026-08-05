@@ -1,0 +1,64 @@
+<?php
+/**
+ * Nexi XPay Build - Customer saved cards template.
+ *
+ * SPDX-FileCopyrightText: Tony <https://github.com/empiricompany>
+ * SPDX-License-Identifier: OSL-3.0
+ * @package Nexi_XPayBuild
+ */
+
+/** @var Nexi_XPayBuild_Block_Customer_Cards $this */
+/** @var Nexi_XPayBuild_Helper_SavedCard $_helperSavedCard */
+$_helperSavedCard = Mage::helper('nexi_xpaybuild/savedCard');
+?>
+<div class="nexi-saved-cards">
+    <div class="page-title">
+        <h1><?php echo $this->__('My Payment Cards') ?></h1>
+    </div>
+    <p>
+        <?php echo $this->__('Your cards are securely stored, no sensitive information is saved on our servers. You can safely manage your saved cards here, removing those you no longer wish to use. Your saved cards can be used for faster checkout on future purchases.') ?>
+    </p>
+
+    <?php if ($cards = $this->getSavedCards()): ?>
+    <table class="nexi-cards-table data-table" cellspacing="0">
+        <thead>
+            <tr>
+                <th><?php echo $this->__('Card') ?></th>
+                <th><?php echo $this->__('Expiry') ?></th>
+                <th><?php echo $this->__('Actions') ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($cards as $_card): ?>
+            <tr>
+                <td>
+                    <img src="<?php echo $this->getSkinUrl($_helperSavedCard->getCardBrandIcon($_card->getBrand())) ?>"
+                         alt="<?php echo $this->escapeHtml($_card->getBrand()) ?>"
+                         width="36" style="vertical-align:middle; margin-right:6px; float:left;" />
+                    <?php echo $this->escapeHtml($_card->getMaskedPan()) ?>
+                </td>
+                <td><?php echo sprintf('%02d/%04d', $_card->getExpiryMonth(), $_card->getExpiryYear()) ?></td>
+                <td>
+                    <form method="post" action="<?php echo $this->escapeHtml($this->getDeleteUrl()) ?>"
+                          onsubmit="return confirm('<?php echo $this->__('Are you sure you want to remove this card?') ?>')">
+                        <?php echo $this->getBlockHtml('formkey') ?>
+                        <input type="hidden" name="id" value="<?php echo (int) $_card->getId() ?>">
+                        <button type="submit" class="btn-remove">
+                            <span><span><?php echo $this->__('Remove') ?></span></span>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php else: ?>
+    <p class="nexi-no-cards"><?php echo $this->__('You have no saved payment cards.') ?></p>
+    <?php endif; ?>
+
+    <div class="buttons-set">
+        <a href="<?php echo $this->getUrl('customer/account') ?>" class="back-link">
+            <span><span><?php echo $this->__('Back') ?></span></span>
+        </a>
+    </div>
+</div>

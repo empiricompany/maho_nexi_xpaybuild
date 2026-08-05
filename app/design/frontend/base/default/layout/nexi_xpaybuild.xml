@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Nexi XPay Build Payment Module for Maho
+ * Layout updates: XPay Build card payments.
+ *
+ * SPDX-FileCopyrightText: Tony <https://github.com/empiricompany>
+ * SPDX-License-Identifier: OSL-3.0
+ * @package Nexi_XPayBuild
+ */
+-->
+<layout version="0.2.0">
+    <nexi_checkout_assets>
+        <reference name="head">
+            <action method="addJs">
+                <script>nexi/xpaybuild/checkout.js</script>
+            </action>
+            <action method="addCss">
+                <stylesheet>nexi/xpaybuild/css/xpaybuild.css</stylesheet>
+            </action>
+        </reference>
+    </nexi_checkout_assets>
+
+    <checkout_onepage_index>
+        <update handle="nexi_checkout_assets"/>
+    </checkout_onepage_index>
+
+    <customer_account>
+        <reference name="customer_account_navigation">
+            <action method="addLink" translate="label" module="nexi_xpaybuild">
+                <name>nexi_saved_cards</name>
+                <path>nexixpaybuild/account/index</path>
+                <label>My Payment Cards</label>
+            </action>
+        </reference>
+    </customer_account>
+
+    <nexixpaybuild_account_index>
+        <update handle="customer_account"/>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/2columns-left.phtml</template>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="nexi_xpaybuild/customer_cards"
+                   name="nexi_saved_cards"
+                   template="nexi/xpaybuild/customer/cards.phtml"/>
+        </reference>
+    </nexixpaybuild_account_index>
+</layout>

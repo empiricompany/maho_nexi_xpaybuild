@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Nexi_XPayBuild>
+            <version>1.0.0</version>
+        </Nexi_XPayBuild>
+    </modules>
+
+    <global>
+        <models>
+            <nexi_xpaybuild>
+                <class>Nexi_XPayBuild_Model</class>
+                <resourceModel>nexi_xpaybuild_resource</resourceModel>
+            </nexi_xpaybuild>
+            <nexi_xpaybuild_resource>
+                <class>Nexi_XPayBuild_Model_Resource</class>
+                <entities>
+                    <saved_card>
+                        <table>nexi_saved_cards</table>
+                    </saved_card>
+                </entities>
+            </nexi_xpaybuild_resource>
+        </models>
+
+        <helpers>
+            <nexi_xpaybuild>
+                <class>Nexi_XPayBuild_Helper</class>
+            </nexi_xpaybuild>
+        </helpers>
+
+        <blocks>
+            <nexi_xpaybuild>
+                <class>Nexi_XPayBuild_Block</class>
+            </nexi_xpaybuild>
+        </blocks>
+    </global>
+
+    <frontend>
+        <secure_url>
+            <nexi_xpaybuild_checkout>/nexixpaybuild/checkout</nexi_xpaybuild_checkout>
+        </secure_url>
+        <layout>
+            <updates>
+                <nexi_xpaybuild>
+                    <file>nexi_xpaybuild.xml</file>
+                </nexi_xpaybuild>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Nexi_XPayBuild>
+                    <files>
+                        <default>Nexi_XPayBuild.csv</default>
+                    </files>
+                </Nexi_XPayBuild>
+            </modules>
+        </translate>
+    </frontend>
+
+    <adminhtml>
+        <translate>
+            <modules>
+                <Nexi_XPayBuild>
+                    <files>
+                        <default>Nexi_XPayBuild.csv</default>
+                    </files>
+                </Nexi_XPayBuild>
+            </modules>
+        </translate>
+    </adminhtml>
+
+    <default>
+        <payment>
+            <nexi_xpaybuild>
+                <active>0</active>
+                <model>nexi_xpaybuild/payment_nexiPayment</model>
+                <title>Credit Card (Nexi)</title>
+                <environment>sandbox</environment>
+                <card_form_style>CARD</card_form_style>
+                <accounting_type>C</accounting_type>
+                <order_status>processing</order_status>
+                <oneclick_enabled>1</oneclick_enabled>
+                <allowspecific>0</allowspecific>
+                <sort_order>10</sort_order>
+                <payment_action>authorize</payment_action>
+            </nexi_xpaybuild>
+        </payment>
+    </default>
+</config>
