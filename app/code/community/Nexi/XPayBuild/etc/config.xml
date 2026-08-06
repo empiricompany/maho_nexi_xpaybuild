@@ -82,7 +82,6 @@
                 <oneclick_enabled>1</oneclick_enabled>
                 <allowspecific>0</allowspecific>
                 <sort_order>10</sort_order>
-                <payment_action>authorize_capture</payment_action>
             </nexi_xpaybuild>
         </payment>
     </default>
