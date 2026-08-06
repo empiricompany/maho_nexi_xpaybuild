@@ -104,6 +104,9 @@ I token delle carte sono memorizzati nella tabella `nexi_saved_cards` e contengo
 7. L'ordine viene creato, la transazione registrata e (se contabilizzazione immediata) la fattura emessa
 8. Redirect alla pagina di successo
 
+## Screen Demo
+<img width="497" height="664" alt="demo_checkout" src="https://github.com/user-attachments/assets/df33795a-d561-492b-9a94-d5404f469fb2" />
+
 ---
 
 ## Licenza
