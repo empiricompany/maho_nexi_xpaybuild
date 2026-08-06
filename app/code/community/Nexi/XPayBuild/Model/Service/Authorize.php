@@ -6,8 +6,7 @@ declare(strict_types=1);
  * Shared service that performs the XPay nonce authorization API call and
  * persists the response fields + transaction state on the payment info.
  *
- * Used by both the AJAX checkout flow (Nexi_XPayBuild_Model_Service_Checkout::placeOrder)
- * and the legacy payment method model (Nexi_XPayBuild_Model_Payment_NexiPayment)
+ * Used by Nexi_XPayBuild_Model_Payment_NexiPayment::_authorizeXpay()
  * to avoid duplicating the API + response handling logic.
  *
  * SPDX-FileCopyrightText: Tony <https://github.com/empiricompany>

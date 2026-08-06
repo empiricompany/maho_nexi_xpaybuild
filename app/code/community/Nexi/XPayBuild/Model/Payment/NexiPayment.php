@@ -19,7 +19,7 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
     protected $_infoBlockType = 'nexi_xpaybuild/info';
 
     protected $_isGateway = true;
-    protected $_isInitializeNeeded = true;
+    protected $_isInitializeNeeded = false;
     protected $_canAuthorize = true;
     protected $_canCapture = true;
     protected $_canRefund = true;
@@ -71,6 +71,16 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
         $info = $this->getInfoInstance();
         $info->setAdditionalInformation('nexi_gateway', 'XPAY');
 
+        $nonce = $data->getData('xpay_nonce');
+        if ($nonce) {
+            $info->setAdditionalInformation('nexi_nonce', (string) $nonce);
+        }
+
+        $codTrans = $data->getData('xpay_cod_trans');
+        if ($codTrans) {
+            $info->setAdditionalInformation('nexi_cod_trans', (string) $codTrans);
+        }
+
         $savedCardId = $data->getData('saved_card_id');
         $info->setAdditionalInformation('nexi_saved_card_id', $savedCardId !== null ? (int) $savedCardId : 0);
 
@@ -81,18 +91,18 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
     }
 
     /**
-     * The order is placed through the module's placeOrder endpoint, which
-     * authorizes via Service/Authorize before saveOrder(). initialize()
-     * therefore only marks the order as pending payment and — via
-     * $_isInitializeNeeded — prevents submitOrder() from invoking
-     * authorize()/capture() a second time.
+     * Determine the payment action based on the configured accounting type:
+     * TCONTAB=C (immediate) → authorize_capture, TCONTAB=D (deferred) → authorize.
      */
     #[\Override]
-    public function initialize($paymentAction, $stateObject): void
+    public function getConfigPaymentAction(): ?string
     {
-        $stateObject->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
-        $stateObject->setStatus(true);
-        $stateObject->setIsNotified(false);
+        $helper = Mage::helper('nexi_xpaybuild');
+        $accountingType = $helper->getAccountingType();
+
+        return $accountingType === Nexi_XPayBuild_Model_Api_XpayClient::XPAY_TCONTAB_IMMEDIATE
+            ? self::ACTION_AUTHORIZE_CAPTURE
+            : self::ACTION_AUTHORIZE;
     }
 
     #[\Override]
@@ -104,6 +114,20 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
     #[\Override]
     public function capture(DataObject $payment, $amount): static
     {
+        $helper = Mage::helper('nexi_xpaybuild');
+
+        // During place order with ACTION_AUTHORIZE_CAPTURE (TCONTAB=C),
+        // the framework calls capture() — the API call (pagaNonce with
+        // TCONTAB=C) authorizes AND captures in one step, so delegate
+        // to _authorizeXpay() which does the real work.
+        if ($helper->getAccountingType() === Nexi_XPayBuild_Model_Api_XpayClient::XPAY_TCONTAB_IMMEDIATE
+            && $payment->getAdditionalInformation('nexi_nonce')
+        ) {
+            return $this->_authorizeXpay($payment, (float) $amount);
+        }
+
+        // Admin capture (invoice capture) or deferred capture: call the
+        // Nexi contabilizza API to capture a previously authorized amount.
         return $this->_captureXpay($payment, (float) $amount);
     }
 
@@ -152,6 +176,20 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
         $accountingType = $helper->getAccountingType();
         $billingAddress = $order->getBillingAddress();
 
+        $savedCardId = (int) $payment->getAdditionalInformation('nexi_saved_card_id');
+        $customerId = (int) $order->getCustomerId();
+        $savedCard = null;
+        if ($savedCardId > 0 && $customerId > 0) {
+            $savedCard = Mage::helper('nexi_xpaybuild/savedCard')->loadCard($savedCardId, $customerId);
+            if ($savedCard === null) {
+                Mage::throwException(
+                    $helper->__('The selected saved card is not valid. Please use a new card.')
+                );
+            }
+        }
+
+        $saveCard = (bool) $payment->getAdditionalInformation('nexi_save_card');
+
         $result = Mage::getModel('nexi_xpaybuild/service_authorize')->authorize(
             $payment,
             $codTrans,
@@ -163,11 +201,43 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
             $billingAddress?->getLastname(),
             $order->getCustomerEmail(),
             $order->getIncrementId(),
+            $saveCard && $customerId > 0 && $savedCard === null,
+            $customerId,
+            $savedCard !== null,
         );
 
         $payment->setTransactionId($codTrans);
 
-        $helper->createInvoiceIfImmediate($order, $result['esito'], $accountingType, $codTrans);
+        $esito = $result['esito'];
+        $rawDetails = $result['rawDetails'];
+        $numeroContratto = $result['numeroContratto'];
+
+        if ($esito === 'OK' && $accountingType === Nexi_XPayBuild_Model_Api_XpayClient::XPAY_TCONTAB_IMMEDIATE) {
+            $payment->setIsTransactionClosed(true);
+            $payment->setIsTransactionPending(false);
+        } elseif ($esito === 'PEN') {
+            $payment->setIsTransactionPending(true);
+            $payment->setIsTransactionClosed(false);
+        } else {
+            $payment->setIsTransactionClosed(false);
+        }
+
+        if ($esito === 'OK' && $saveCard && $customerId > 0) {
+            Mage::helper('nexi_xpaybuild/savedCard')->saveCardFromResponse(
+                $result['response'],
+                $numeroContratto,
+                $order,
+            );
+        }
+
+        if ($savedCard !== null) {
+            Mage::helper('nexi_xpaybuild/savedCard')->enrichFromSavedCard(
+                $payment,
+                $rawDetails,
+                $savedCardId,
+                $customerId,
+            );
+        }
 
         return $this;
     }
@@ -175,17 +245,6 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
     protected function _captureXpay(DataObject $payment, float $amount): static
     {
         $helper = Mage::helper('nexi_xpaybuild');
-
-        if ($helper->getAccountingType() === Nexi_XPayBuild_Model_Api_XpayClient::XPAY_TCONTAB_IMMEDIATE) {
-            $helper->log(
-                'NexiPayment::_captureXpay() no-op: immediate accounting (TCONTAB=C), already captured at order time.',
-                Mage::LOG_DEBUG,
-            );
-            $payment->setIsTransactionClosed(true);
-            $payment->setIsTransactionPending(false);
-            return $this;
-        }
-
         $order = $payment->getOrder();
         $codTrans = (string) $payment->getAdditionalInformation('nexi_cod_trans');
 

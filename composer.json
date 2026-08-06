@@ -1,6 +1,6 @@
 {
     "name": "empiricompany/maho-nexi-xpaybuild",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "license": "OSL-3.0",
     "type": "maho-module",
     "description": "Nexi XPay Build embedded card payment for Maho",

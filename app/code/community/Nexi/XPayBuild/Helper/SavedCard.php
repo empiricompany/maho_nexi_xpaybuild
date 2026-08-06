@@ -133,9 +133,9 @@ class Nexi_XPayBuild_Helper_SavedCard extends Mage_Core_Helper_Abstract
     public function saveCardFromResponse(
         array $response,
         ?string $numeroContratto,
-        Mage_Sales_Model_Quote $quote,
+        Mage_Sales_Model_Order $order,
     ): void {
-        $customerId = (int) $quote->getCustomerId();
+        $customerId = (int) $order->getCustomerId();
         if (!$customerId) {
             return;
         }

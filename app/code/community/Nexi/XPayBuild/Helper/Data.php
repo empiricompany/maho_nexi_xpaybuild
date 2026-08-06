@@ -122,59 +122,6 @@ class Nexi_XPayBuild_Helper_Data extends Mage_Core_Helper_Abstract
         return (string) Mage::getConfig()->getNode('modules/Nexi_XPayBuild/version');
     }
 
-    /**
-     * Create the invoice when the gateway already captured the payment in the
-     * same authorize call (immediate accounting, TCONTAB=C). Shared by the
-     * AJAX checkout flow (Model/Service/Checkout) and the legacy payment
-     * method
-     * (NexiPayment) to avoid duplicating the conditional + call.
-     */
-    public function createInvoiceIfImmediate(
-        Mage_Sales_Model_Order $order,
-        string $esito,
-        string $accountingType,
-        string $transactionId = '',
-    ): ?Mage_Sales_Model_Order_Invoice {
-        if ($esito !== 'OK' || $accountingType !== Nexi_XPayBuild_Model_Api_XpayClient::XPAY_TCONTAB_IMMEDIATE) {
-            return null;
-        }
-
-        return $this->createInvoiceForOrder($order, $transactionId);
-    }
-
-    public function createInvoiceForOrder(Mage_Sales_Model_Order $order, string $transactionId = ''): ?Mage_Sales_Model_Order_Invoice
-    {
-        if (!$order->canInvoice()) {
-            $this->log('createInvoiceForOrder: cannot invoice order ' . $order->getId(), Mage::LOG_WARNING);
-            return null;
-        }
-
-        $invoice = $order->prepareInvoice();
-        $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
-        $invoice->register();
-
-        if ($transactionId) {
-            $invoice->setTransactionId($transactionId);
-        }
-
-        Mage::getModel('core/resource_transaction')
-            ->addObject($invoice)
-            ->addObject($invoice->getOrder())
-            ->save();
-
-        if (!$order->getEmailSent()) {
-            try {
-                $order->sendNewOrderEmail();
-                $order->setEmailSent(true);
-                $order->save();
-            } catch (\Throwable $e) {
-                $this->log('createInvoiceForOrder: sendNewOrderEmail error: ' . $e->getMessage(), Mage::LOG_WARNING);
-            }
-        }
-
-        return $invoice;
-    }
-
     public function formatExpiry(string $expiry): string
     {
         if ($expiry === '' || !preg_match('/^(\d{4})(\d{2})$/', $expiry, $matches)) {

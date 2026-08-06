@@ -34,11 +34,6 @@ class Nexi_XPayBuild_Block_Info extends Mage_Payment_Block_Info
         return $scadenza;
     }
 
-    public function getAuthCode(): string
-    {
-        return (string) $this->getInfo()->getAdditionalInformation('nexi_codAut');
-    }
-
     public function getTransactionId(): string
     {
         return (string) $this->getInfo()->getAdditionalInformation('nexi_cod_trans');

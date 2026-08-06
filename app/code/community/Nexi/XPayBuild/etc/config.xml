@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Nexi_XPayBuild>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
         </Nexi_XPayBuild>
     </modules>
 
@@ -82,7 +82,7 @@
                 <oneclick_enabled>1</oneclick_enabled>
                 <allowspecific>0</allowspecific>
                 <sort_order>10</sort_order>
-                <payment_action>authorize</payment_action>
+                <payment_action>authorize_capture</payment_action>
             </nexi_xpaybuild>
         </payment>
     </default>
