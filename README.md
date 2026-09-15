@@ -5,6 +5,9 @@ Modulo di pagamento con form embedded (senza redirect) per carte di credito tram
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/empiricompany/maho-nexi-xpaybuild.svg?style=flat-square)](https://packagist.org/packages/empiricompany/maho-nexi-xpaybuild)
 [![Total Downloads](https://img.shields.io/packagist/dt/empiricompany/maho-nexi-xpaybuild.svg?style=flat-square)](https://packagist.org/packages/empiricompany/maho-nexi-xpaybuild)
 [![Software License](https://img.shields.io/badge/license-OSL--3.0-brightgreen.svg?style=flat-square)](LICENSE)
+![Maho Commerce](https://img.shields.io/badge/Maho_Commerce-module-orange)
+![PHP](https://img.shields.io/badge/php-%3E%3D8.3-8892BF)
+![PHPStan Level](https://img.shields.io/badge/PHPStan-level%208-brightgreen)
 
 ---
 
@@ -106,6 +109,27 @@ I token delle carte sono memorizzati nella tabella `nexi_saved_cards` e contengo
 
 ## Screen Demo
 <img width="497" height="664" alt="demo_checkout" src="https://github.com/user-attachments/assets/df33795a-d561-492b-9a94-d5404f469fb2" />
+
+---
+
+## Sviluppo
+
+Il modulo adotta i gate CI standard di Maho: gli stessi controlli vengono eseguiti su ogni pull request.
+
+- **PHPUnit** (unit test) — `composer test`
+- **PHPStan** (level 8) — `composer phpstan`
+- **Rector** (dry-run) — `composer rector`
+- **PHP CS Fixer** (dry-run) — `composer cs` (oppure `composer cs-fix` per applicare le correzioni)
+- **Controlli di sintassi PHP / XML** — `composer lint`
+- **Matrix CI** — `.github/workflows/ci.yml` esegue gli stessi gate su PHP 8.3, 8.4 e 8.5
+
+### Contribuire
+
+1. Fai un fork del repository e crea un branch dedicato (`fix/...`, `feature/...`).
+2. Installa le dipendenze una volta con `composer install`.
+3. Implementa la modifica con un focus singolo e mirato.
+4. Prima di aprire la pull request esegui tutti i gate in locale con `composer check` (ordine: test → lint → cs → phpstan → rector).
+5. Apri la pull request verso `main` descrivendo il problema e la soluzione proposta: la CI deve risultare verde su tutte le versioni PHP supportate.
 
 ---
 
