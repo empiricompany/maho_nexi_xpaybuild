@@ -95,16 +95,14 @@ class Nexi_XPayBuild_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getCurrencyNumericCode(?string $currencyCode = null): string
     {
-        if ($currencyCode === null) {
-            $currencyCode = $this->getStoreCurrencyCode();
-        }
+        $currencyCode ??= $this->getStoreCurrencyCode();
 
         return self::CURRENCY_NUMERIC_CODES[$currencyCode] ?? '978';
     }
 
     public function getStoreCurrencyCode(): string
     {
-        return Mage::app()->getStore()->getCurrentCurrencyCode();
+        return Mage::app()->getStore()?->getCurrentCurrencyCode() ?? 'EUR';
     }
 
     public function generateTransactionId(Mage_Sales_Model_Quote|Mage_Sales_Model_Order $entity): string
@@ -119,7 +117,10 @@ class Nexi_XPayBuild_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getModuleVersion(): string
     {
-        return (string) Mage::getConfig()->getNode('modules/Nexi_XPayBuild/version');
+        $config = Mage::getConfig();
+        $node = $config !== null ? $config->getNode('modules/Nexi_XPayBuild/version') : false;
+
+        return $node !== false ? (string) $node : '';
     }
 
     public function formatExpiry(string $expiry): string
@@ -158,7 +159,7 @@ class Nexi_XPayBuild_Helper_Data extends Mage_Core_Helper_Abstract
      * @return array<string, mixed>
      */
     public function saveResponseFields(
-        Mage_Payment_Model_Info $payment,
+        Mage_Sales_Model_Order_Payment $payment,
         array $response,
         array $specialFields,
     ): array {
@@ -179,6 +180,7 @@ class Nexi_XPayBuild_Helper_Data extends Mage_Core_Helper_Abstract
 
         $payment->setTransactionAdditionalInfo(
             Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
+            // @phpstan-ignore argument.type (RAW_DETAILS is an array by design; core phpdoc declares string)
             $rawDetails,
         );
 

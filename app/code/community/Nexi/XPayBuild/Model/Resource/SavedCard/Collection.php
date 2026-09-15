@@ -14,9 +14,10 @@ use Maho\Data\Collection;
 
 class Nexi_XPayBuild_Model_Resource_SavedCard_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract
 {
+    #[\Override]
     protected function _construct(): void
     {
-        $this->_init('nexi_xpaybuild/savedCard', 'nexi_xpaybuild/savedCard');
+        $this->_init('nexi_xpaybuild/savedCard');
     }
 
     public function addCustomerFilter(int $customerId): static

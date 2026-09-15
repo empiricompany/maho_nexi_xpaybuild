@@ -1,0 +1,22 @@
+name: Release
+
+on:
+    push:
+        tags:
+            # Tags are plain semantic versions (e.g. 1.0.0), without the "v" prefix.
+            - '[0-9]*'
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+            - name: Create release
+              uses: softprops/action-gh-release@v2
+              with:
+                  generate_release_notes: true
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

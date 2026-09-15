@@ -33,11 +33,11 @@ $_preSelectedCardId = 0;
                 name="nexi_saved_card"
                 value="<?= (int) $card->getId() ?>"
                 <?php if (!$_preSelectedCardId): echo 'checked'; $_preSelectedCardId = (int) $card->getId(); endif ?> />
-            <img src="<?= $this->getSkinUrl($_helperSavedCard->getCardBrandIcon($card->getBrand())) ?>"
+            <img src="<?= $this->getSkinUrl($_helperSavedCard->getCardBrandIcon((string) $card->getBrand())) ?>"
                  alt="<?= $this->escapeHtml($card->getBrand()) ?>"
                  width="36" style="vertical-align:middle; margin-right:4px; float:left; max-height:24px; width:auto;" />
             <?= $this->escapeHtml($card->getMaskedPan()) ?>
-            (<?= $this->__('Exp.') ?> <?= $this->escapeHtml($card->getExpiryMonth()) ?>/<?= $this->escapeHtml($card->getExpiryYear()) ?>)
+            (<?= $this->__('Exp.') ?> <?= $this->escapeHtml((string) $card->getExpiryMonth()) ?>/<?= $this->escapeHtml((string) $card->getExpiryYear()) ?>)
         </label>
         <?php endforeach ?>
 

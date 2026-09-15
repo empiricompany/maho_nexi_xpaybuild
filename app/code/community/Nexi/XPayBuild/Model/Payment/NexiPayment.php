@@ -27,6 +27,7 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
     protected $_canVoid = false;
     protected $_canUseInternal = false;
     protected $_canUseCheckout = true;
+    /** @var bool */
     protected $_canUseForMultishipping = false;
 
     #[\Override]
@@ -105,14 +106,22 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
             : self::ACTION_AUTHORIZE;
     }
 
+    /**
+     * @param float $amount
+     * @return $this
+     */
     #[\Override]
-    public function authorize(DataObject $payment, $amount): static
+    public function authorize(DataObject $payment, $amount)
     {
         return $this->_authorizeXpay($payment, (float) $amount);
     }
 
+    /**
+     * @param float $amount
+     * @return $this
+     */
     #[\Override]
-    public function capture(DataObject $payment, $amount): static
+    public function capture(DataObject $payment, $amount)
     {
         $helper = Mage::helper('nexi_xpaybuild');
 
@@ -131,8 +140,12 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
         return $this->_captureXpay($payment, (float) $amount);
     }
 
+    /**
+     * @param float $amount
+     * @return $this
+     */
     #[\Override]
-    public function refund(DataObject $payment, $amount): static
+    public function refund(DataObject $payment, $amount)
     {
         return $this->_refundXpay($payment, (float) $amount);
     }
@@ -141,7 +154,7 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
     public function void(DataObject $payment): never
     {
         Mage::throwException(
-            Mage::helper('nexi_xpaybuild')->__('Void not supported for XPay gateway. Use refund instead.')
+            Mage::helper('nexi_xpaybuild')->__('Void not supported for XPay gateway. Use refund instead.'),
         );
     }
 
@@ -152,8 +165,12 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
         return $title ? (string) $title : parent::getTitle();
     }
 
-    protected function _authorizeXpay(DataObject $payment, float $amount): static
+    /**
+     * @return $this
+     */
+    protected function _authorizeXpay(DataObject $payment, float $amount)
     {
+        /** @var Mage_Sales_Model_Order_Payment $payment */
         $helper = Mage::helper('nexi_xpaybuild');
         $order = $payment->getOrder();
 
@@ -162,7 +179,7 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
 
         if ($nonce === '') {
             Mage::throwException(
-                $helper->__('XPay nonce is missing. Please retry the payment.')
+                $helper->__('XPay nonce is missing. Please retry the payment.'),
             );
         }
 
@@ -174,7 +191,7 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
         $importo = $helper->formatAmountToMinorUnit($amount, $currencyCode);
         $divisa = $helper->getCurrencyNumericCode($currencyCode);
         $accountingType = $helper->getAccountingType();
-        $billingAddress = $order->getBillingAddress();
+        $billingAddress = $order->getBillingAddress() ?: null;
 
         $savedCardId = (int) $payment->getAdditionalInformation('nexi_saved_card_id');
         $customerId = (int) $order->getCustomerId();
@@ -183,7 +200,7 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
             $savedCard = Mage::helper('nexi_xpaybuild/savedCard')->loadCard($savedCardId, $customerId);
             if ($savedCard === null) {
                 Mage::throwException(
-                    $helper->__('The selected saved card is not valid. Please use a new card.')
+                    $helper->__('The selected saved card is not valid. Please use a new card.'),
                 );
             }
         }
@@ -242,8 +259,12 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
         return $this;
     }
 
-    protected function _captureXpay(DataObject $payment, float $amount): static
+    /**
+     * @return $this
+     */
+    protected function _captureXpay(DataObject $payment, float $amount)
     {
+        /** @var Mage_Sales_Model_Order_Payment $payment */
         $helper = Mage::helper('nexi_xpaybuild');
         $order = $payment->getOrder();
         $codTrans = (string) $payment->getAdditionalInformation('nexi_cod_trans');
@@ -273,8 +294,12 @@ class Nexi_XPayBuild_Model_Payment_NexiPayment extends Mage_Payment_Model_Method
         return $this;
     }
 
-    protected function _refundXpay(DataObject $payment, float $amount): static
+    /**
+     * @return $this
+     */
+    protected function _refundXpay(DataObject $payment, float $amount)
     {
+        /** @var Mage_Sales_Model_Order_Payment $payment */
         $helper = Mage::helper('nexi_xpaybuild');
         $order = $payment->getOrder();
         $codTrans = (string) $payment->getAdditionalInformation('nexi_cod_trans');

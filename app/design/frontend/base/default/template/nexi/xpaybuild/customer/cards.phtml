@@ -32,12 +32,12 @@ $_helperSavedCard = Mage::helper('nexi_xpaybuild/savedCard');
             <?php foreach ($cards as $_card): ?>
             <tr>
                 <td>
-                    <img src="<?php echo $this->getSkinUrl($_helperSavedCard->getCardBrandIcon($_card->getBrand())) ?>"
+                    <img src="<?php echo $this->getSkinUrl($_helperSavedCard->getCardBrandIcon((string) $_card->getBrand())) ?>"
                          alt="<?php echo $this->escapeHtml($_card->getBrand()) ?>"
                          width="36" style="vertical-align:middle; margin-right:6px; float:left;" />
                     <?php echo $this->escapeHtml($_card->getMaskedPan()) ?>
                 </td>
-                <td><?php echo sprintf('%02d/%04d', $_card->getExpiryMonth(), $_card->getExpiryYear()) ?></td>
+                <td><?php echo sprintf('%02d/%04d', (int) $_card->getExpiryMonth(), (int) $_card->getExpiryYear()) ?></td>
                 <td>
                     <form method="post" action="<?php echo $this->escapeHtml($this->getDeleteUrl()) ?>"
                           onsubmit="return confirm('<?php echo $this->__('Are you sure you want to remove this card?') ?>')">

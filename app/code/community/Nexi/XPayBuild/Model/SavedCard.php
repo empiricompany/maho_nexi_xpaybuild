@@ -14,6 +14,7 @@ class Nexi_XPayBuild_Model_SavedCard extends Mage_Core_Model_Abstract
 {
     public const GATEWAY_TYPE_XPAY = 'XPAY';
 
+    #[\Override]
     protected function _construct(): void
     {
         $this->_init('nexi_xpaybuild/savedCard');

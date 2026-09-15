@@ -32,6 +32,7 @@ class Nexi_XPayBuild_Block_Customer_Cards extends Mage_Core_Block_Template
         return $this->getUrl('nexixpaybuild/account/delete');
     }
 
+    #[\Override]
     public function getFormKey(): string
     {
         return Mage::getSingleton('core/session')->getFormKey();

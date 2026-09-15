@@ -151,8 +151,8 @@ class Nexi_XPayBuild_CheckoutController extends Mage_Core_Controller_Front_Actio
                 Mage::throwException(Mage::helper('nexi_xpaybuild')->__('This order has already been placed.'));
             }
 
-            $nonce = preg_replace('/[^a-zA-Z0-9\-_]/', '', (string) $this->getRequest()->getParam('xpay_nonce', ''));
-            $codTrans = preg_replace('/[^a-zA-Z0-9\-]/', '', (string) $this->getRequest()->getParam('xpay_cod_trans', ''));
+            $nonce = (string) preg_replace('/[^a-zA-Z0-9\-_]/', '', (string) $this->getRequest()->getParam('xpay_nonce', ''));
+            $codTrans = (string) preg_replace('/[^a-zA-Z0-9\-]/', '', (string) $this->getRequest()->getParam('xpay_cod_trans', ''));
             $savedCardId = (int) $this->getRequest()->getParam('saved_card_id', 0);
             $saveCard = (bool) $this->getRequest()->getParam('save_card', false);
 

@@ -29,6 +29,9 @@ class Nexi_XPayBuild_Helper_SavedCard extends Mage_Core_Helper_Abstract
     ): Nexi_XPayBuild_Model_SavedCard {
         $resource = Mage::getSingleton('core/resource');
         $write = $resource->getConnection('core_write');
+        if ($write === false) {
+            Mage::throwException(Mage::helper('nexi_xpaybuild')->__('Database connection is unavailable.'));
+        }
         $table = $resource->getTableName('nexi_xpaybuild/saved_card');
 
         $data = [
@@ -48,8 +51,13 @@ class Nexi_XPayBuild_Helper_SavedCard extends Mage_Core_Helper_Abstract
             ['masked_pan', 'brand', 'expiry_month', 'expiry_year', 'gateway_type', 'is_active'],
         );
 
-        $card = Mage::getModel('nexi_xpaybuild/savedCard')
-            ->getCollection()
+        $collection = Mage::getModel('nexi_xpaybuild/savedCard')->getCollection();
+        if ($collection === false) {
+            Mage::throwException(Mage::helper('nexi_xpaybuild')->__('Unable to load saved cards.'));
+        }
+
+        /** @var Nexi_XPayBuild_Model_SavedCard $card */
+        $card = $collection
             ->addFieldToFilter('customer_id', $customerId)
             ->addFieldToFilter('gateway_token', $gatewayToken)
             ->setPageSize(1)
@@ -63,16 +71,21 @@ class Nexi_XPayBuild_Helper_SavedCard extends Mage_Core_Helper_Abstract
      */
     public function getActiveCards(int $customerId, ?string $gatewayType = null): array
     {
-        $collection = Mage::getModel('nexi_xpaybuild/savedCard')
-            ->getCollection()
-            ->addCustomerFilter($customerId)
-            ->setOrderByCreatedAtDesc();
+        $collection = Mage::getModel('nexi_xpaybuild/savedCard')->getCollection();
+        if (!$collection instanceof Nexi_XPayBuild_Model_Resource_SavedCard_Collection) {
+            return [];
+        }
+
+        $collection->addCustomerFilter($customerId)->setOrderByCreatedAtDesc();
 
         if ($gatewayType !== null) {
             $collection->addGatewayTypeFilter($gatewayType);
         }
 
-        return $collection->getItems();
+        /** @var Nexi_XPayBuild_Model_SavedCard[] $items */
+        $items = $collection->getItems();
+
+        return $items;
     }
 
     public function getCardBrandIcon(string $brand): string
@@ -182,7 +195,7 @@ class Nexi_XPayBuild_Helper_SavedCard extends Mage_Core_Helper_Abstract
      * @param array<string, mixed> $rawDetails
      */
     public function enrichFromSavedCard(
-        Mage_Payment_Model_Info $payment,
+        Mage_Sales_Model_Order_Payment $payment,
         array &$rawDetails,
         int $savedCardId,
         int $customerId,
@@ -208,6 +221,7 @@ class Nexi_XPayBuild_Helper_SavedCard extends Mage_Core_Helper_Abstract
 
         $payment->setTransactionAdditionalInfo(
             Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
+            // @phpstan-ignore argument.type (RAW_DETAILS is an array by design; core phpdoc declares string)
             $rawDetails,
         );
     }

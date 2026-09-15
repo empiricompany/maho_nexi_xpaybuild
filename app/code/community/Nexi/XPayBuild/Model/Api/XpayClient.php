@@ -36,11 +36,7 @@ class Nexi_XPayBuild_Model_Api_XpayClient
     private readonly Nexi_XPayBuild_Helper_Mac $_macHelper;
     private readonly HttpClientInterface $_httpClient;
 
-    /**
-     * @param array<string, mixed> $arguments Ignored; kept for compatibility with the
-     *                                        Mage::getModel() factory which passes an array.
-     */
-    public function __construct(array $arguments = [])
+    public function __construct()
     {
         $this->_helper = Mage::helper('nexi_xpaybuild');
         $this->_macHelper = Mage::helper('nexi_xpaybuild/mac');

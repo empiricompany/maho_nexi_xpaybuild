@@ -20,11 +20,11 @@ class Nexi_XPayBuild_Model_Service_Authorize
      * Perform the nonce authorization against the XPay API and persist the
      * response fields and transaction state on the given payment info.
      *
-     * @param Mage_Payment_Model_Info $payment Payment info to enrich.
+     * @param Mage_Sales_Model_Order_Payment $payment Payment info to enrich.
      * @return array{response: array, esito: string, numeroContratto: ?string, rawDetails: array}
      */
     public function authorize(
-        Mage_Payment_Model_Info $payment,
+        Mage_Sales_Model_Order_Payment $payment,
         string $codTrans,
         int $importo,
         string $divisa,
@@ -45,21 +45,43 @@ class Nexi_XPayBuild_Model_Service_Authorize
 
         if ($isRecurring) {
             $response = $client->pagamentoRicorrente3DS(
-                $codTrans, $importo, $divisa, $nonce, $accountingType,
-                $firstName, $lastName, $email, $incrementId,
+                $codTrans,
+                $importo,
+                $divisa,
+                $nonce,
+                $accountingType,
+                $firstName,
+                $lastName,
+                $email,
+                $incrementId,
             );
             $numeroContratto = null;
         } elseif ($createContract) {
             $numeroContratto = Mage::helper('nexi_xpaybuild/savedCard')
                 ->generateXpayContractNumber($customerId);
             $response = $client->pagaNonceCreazioneContratto(
-                $codTrans, $importo, $divisa, $nonce, $numeroContratto,
-                $accountingType, $firstName, $lastName, $email, $incrementId,
+                $codTrans,
+                $importo,
+                $divisa,
+                $nonce,
+                $numeroContratto,
+                $accountingType,
+                $firstName,
+                $lastName,
+                $email,
+                $incrementId,
             );
         } else {
             $response = $client->pagaNonce(
-                $codTrans, $importo, $divisa, $nonce, $accountingType,
-                $firstName, $lastName, $email, $incrementId,
+                $codTrans,
+                $importo,
+                $divisa,
+                $nonce,
+                $accountingType,
+                $firstName,
+                $lastName,
+                $email,
+                $incrementId,
             );
             $numeroContratto = null;
         }

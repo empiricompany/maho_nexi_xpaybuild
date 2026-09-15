@@ -1,9 +1,8 @@
 {
     "name": "empiricompany/maho-nexi-xpaybuild",
-    "version": "1.0.2",
+    "description": "Nexi XPay Build embedded card payment for Maho",
     "license": "OSL-3.0",
     "type": "maho-module",
-    "description": "Nexi XPay Build embedded card payment for Maho",
     "keywords": [
         "maho",
         "nexi",
@@ -12,8 +11,35 @@
         "gateway"
     ],
     "require": {
-        "php": ">=8.3 <8.6",
-        "mahocommerce/maho": ">=26.7.0"
+        "php": ">=8.3 <8.6"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "*",
+        "mahocommerce/maho": "*",
+        "mahocommerce/maho-phpstan-plugin": "*",
+        "phpstan/phpstan": "*",
+        "phpstan/phpstan-deprecation-rules": "*",
+        "phpstan/phpstan-strict-rules": "*",
+        "rector/rector": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "mahocommerce/maho-composer-plugin": true
+        },
+        "platform": {
+            "php": "8.3"
+        }
+    },
+    "scripts": {
+        "cs": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "vendor/bin/php-cs-fixer fix",
+        "phpstan": "vendor/bin/phpstan analyze",
+        "rector": "vendor/bin/rector --dry-run",
+        "check": [
+            "@cs",
+            "@phpstan",
+            "@rector"
+        ]
     },
     "extra": {
         "maho-module-dir": "app/code/community/Nexi/XPayBuild"

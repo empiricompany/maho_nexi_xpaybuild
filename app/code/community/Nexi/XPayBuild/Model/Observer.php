@@ -50,6 +50,6 @@ class Nexi_XPayBuild_Model_Observer
         $availableMethods = $response['availableMethods'] ?? [];
 
         Mage::getModel('core/config')->saveConfig('payment/nexi_xpaybuild/url_logo', $urlLogo);
-        Mage::getModel('core/config')->saveConfig('payment/nexi_xpaybuild/available_methods', json_encode($availableMethods));
+        Mage::getModel('core/config')->saveConfig('payment/nexi_xpaybuild/available_methods', json_encode($availableMethods) ?: '[]');
     }
 }

@@ -1,0 +1,22 @@
+name: Line Endings
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+    workflow_dispatch:
+
+jobs:
+    line-endings:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+            - name: Check for CRLF line endings
+              run: |
+                  if git grep -Il $'\r'; then
+                      echo "::error::Files with CRLF line endings detected"
+                      exit 1
+                  fi
+                  echo "No CRLF line endings found"

@@ -12,12 +12,14 @@ declare(strict_types=1);
 
 class Nexi_XPayBuild_Block_Form_Build extends Nexi_XPayBuild_Block_Form_Abstract
 {
+    #[\Override]
     protected function _construct(): void
     {
         parent::_construct();
         $this->setTemplate('nexi/xpaybuild/checkout/form.phtml');
     }
 
+    #[\Override]
     public function getMethodCode(): string
     {
         return 'nexi_xpaybuild';
