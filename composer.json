@@ -20,7 +20,13 @@
         "phpstan/phpstan": "*",
         "phpstan/phpstan-deprecation-rules": "*",
         "phpstan/phpstan-strict-rules": "*",
+        "phpunit/phpunit": "*",
         "rector/rector": "*"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nexi\\XPayBuild\\Tests\\": "tests/"
+        }
     },
     "config": {
         "allow-plugins": {
@@ -31,11 +37,15 @@
         }
     },
     "scripts": {
+        "test": "vendor/bin/phpunit",
+        "lint": "find app tests -type f -name '*.php' -exec php -l {} +",
         "cs": "vendor/bin/php-cs-fixer fix --dry-run --diff",
         "cs-fix": "vendor/bin/php-cs-fixer fix",
         "phpstan": "vendor/bin/phpstan analyze",
         "rector": "vendor/bin/rector --dry-run",
         "check": [
+            "@test",
+            "@lint",
             "@cs",
             "@phpstan",
             "@rector"
