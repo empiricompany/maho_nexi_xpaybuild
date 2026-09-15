@@ -75,7 +75,7 @@
                 <active>0</active>
                 <model>nexi_xpaybuild/payment_nexiPayment</model>
                 <title>Credit Card (Nexi)</title>
-                <environment>sandbox</environment>
+                <environment>test</environment>
                 <card_form_style>CARD</card_form_style>
                 <accounting_type>C</accounting_type>
                 <order_status>processing</order_status>

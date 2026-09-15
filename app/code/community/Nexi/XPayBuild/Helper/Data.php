@@ -42,9 +42,16 @@ class Nexi_XPayBuild_Helper_Data extends Mage_Core_Helper_Abstract
         return 'XPAY';
     }
 
+    /**
+     * Normalise the environment to the only two supported values: "test" or
+     * "production". Anything else is treated as test, so an invalid or empty
+     * configuration can never silently point the gateway at production.
+     */
     public function getXpayEnvironment(?int $storeId = null): string
     {
-        return (string) $this->getConfig('environment', $storeId);
+        $environment = strtolower(trim((string) $this->getConfig('environment', $storeId)));
+
+        return $environment === 'production' ? 'production' : 'test';
     }
 
     public function getXpayAlias(?int $storeId = null): string
