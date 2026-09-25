@@ -24,13 +24,16 @@ class Nexi_XPayBuild_CheckoutController extends Mage_Core_Controller_Front_Actio
     private const RATE_LIMIT_WINDOW = 300;
 
     /**
-     * Parse JSON request body params into the request object
+     * Parse JSON request body params into the request object.
+     *
+     * Must run before parent::preDispatch(): the core validates the form key
+     * on every POST action.
+     *
+     * TODO: refactor to send form-urlencoded data and drop this manual parsing.
      */
     #[\Override]
     public function preDispatch(): static
     {
-        parent::preDispatch();
-
         $contentType = $this->getRequest()->getHeader('Content-Type');
         if ($contentType && str_contains($contentType, 'application/json')) {
             $body = $this->getRequest()->getRawBody();
@@ -42,6 +45,8 @@ class Nexi_XPayBuild_CheckoutController extends Mage_Core_Controller_Front_Actio
                 }
             }
         }
+
+        parent::preDispatch();
 
         return $this;
     }
